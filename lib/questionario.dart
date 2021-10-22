@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
-import './questao.dart';
 import './resposta.dart';
+import './questao.dart';
 
+class Quiz extends StatelessWidget {
+  final List<Map<String, Object>> questions;
+  final int clickedQuestion;
+  final void Function(int) whenAnswer;
 
-
-class Questionario extends StatelessWidget {
-
-  final List perguntas;
-  final int perguntaSelecionada;
-  final void Function() quandoResponder;
-
-  Questionario({
-    @required this.perguntas,
-    @required this.perguntaSelecionada,
-    @required this.quandoResponder,
+  Quiz({
+    required this.questions,
+    required this.clickedQuestion,
+    required this.whenAnswer,
   });
 
-
-  bool get temPerguntaSelecionada {
-    return perguntaSelecionada < perguntas.length;
+  bool get hasSelectedQuestion {
+    return clickedQuestion < questions.length;
   }
 
   @override
   Widget build(BuildContext context) {
-
-  List<String> respostas = temPerguntaSelecionada ? perguntas[perguntaSelecionada]['respostas'] : null;
-
+    List<Map<String, Object>> answers = hasSelectedQuestion
+        ? questions[clickedQuestion].cast()['answers']
+        : null;
     return Column(
-      children: <Widget>[
-        Questao(perguntas[perguntaSelecionada]['texto'].toString()),
-        ...respostas.map((t) => Resposta(t, quandoResponder)).toList(),
+      children: [
+        Question(questions[clickedQuestion]['text'].toString()),
+        ...answers.map((answer) => Answer(answer['text'] as String,
+            () => whenAnswer(int.parse(answer['score'].toString()))))
       ],
     );
   }

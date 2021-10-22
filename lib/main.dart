@@ -1,63 +1,85 @@
 import 'package:flutter/material.dart';
-import './questionario.dart';
+import 'dart:core';
 import './resultado.dart';
+import './questionario.dart';
 
-main() => runApp(PerguntaApp());
+main() => runApp(QuizApp());
 
-class _PerguntaAppState extends State<PerguntaApp>{
-  var _perguntaSelecionada = 0;
+class QuizApp extends StatefulWidget {
+  @override
+  _QuizAppState createState() => _QuizAppState();
+}
 
-  final List _perguntas = const [{
-      'texto': 'Qual é sua cor favorita?',
-      'respostas': ['Preto', 'Azul', 'Verde', 'Vermelho'],
+class _QuizAppState extends State<QuizApp> {
+  var _clickedQuestion = 0;
+  var _totalScore = 0;
+
+  final _questions = const [
+    {
+      'text': 'Qual é sua cor favorita?',
+      'answers': [
+        {'text': 'Preto', 'score': 5},
+        {'text': 'Verde', 'score': 3},
+        {'text': 'Vermelho', 'score': 10},
+        {'text': 'Azul', 'score': 6},
+      ],
     },
     {
-      'texto':'Qual é sua animal favorito?',
-      'respostas': ['Leão', 'Elefante', 'Coelho', 'Cachorro'],
+      'text': 'Qual é sua animal favorito?',
+      'answers': [
+        {'text': 'Lobo', 'score': 5},
+        {'text': 'Tigre', 'score': 3},
+        {'text': 'Tarantula', 'score': 10},
+        {'text': 'Tubarão', 'score': 6},
+      ],
     },
     {
-      'texto':'Qual é seu instrutor preferido?',
-      'respostas': ['Léo', 'Pedro', 'Eduardo', 'Juliana'],
-  }];
+      'text': 'Qual é seu instrutor preferido?',
+      'answers': [
+        {'text': 'Mateus', 'score': 5},
+        {'text': 'Eduardo', 'score': 3},
+        {'text': 'Gabriela', 'score': 10},
+        {'text': 'Luana', 'score': 6},
+      ],
+    },
+  ];
 
-
-  void _responder(){
-    if(temPerguntaSelecionada){
-    setState(() {
-      _perguntaSelecionada++;
+  void _answer(int score) {
+    if (hasSelectedQuestion) {
+      setState(() {
+        _clickedQuestion++;
+        _totalScore += score;
       });
+      // print(_clickedQuestion);
+      print(_totalScore);
     }
   }
 
-   bool get temPerguntaSelecionada {
-    return _perguntaSelecionada < _perguntas.length;
+  void _resetQuiz() {
+    setState(() {
+      _clickedQuestion = 0;
+      _totalScore = 0;
+    });
+  }
+
+  bool get hasSelectedQuestion {
+    return _clickedQuestion < _questions.length;
   }
 
   @override
   Widget build(BuildContext context) {
-   
-    
-
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Perguntas'),
-        ),
-        body: temPerguntaSelecionada ?
-        Questionario(
-          perguntas: _perguntas,
-          perguntaSelecionada: _perguntaSelecionada,
-          quandoResponder: _responder,
-        )
-        : Resultado('Parabéns!')
+        home: Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text('Quizz App')),
       ),
-    );
-  }
-
-}
-
-class PerguntaApp extends StatefulWidget {
-  _PerguntaAppState createState(){
-    return _PerguntaAppState();
+      body: hasSelectedQuestion
+          ? Quiz(
+              questions: _questions,
+              whenAnswer: _answer,
+              clickedQuestion: _clickedQuestion,
+            )
+          : Result(_totalScore, _resetQuiz),
+    ));
   }
 }
